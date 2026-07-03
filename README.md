@@ -1,25 +1,45 @@
-## MovieVerse
+# MovieVerse - Jetpack Compose
 
-Aplikasi ini menyajikan daftar film populer secara *real-time* dari internet dan memiliki fitur penyimpanan lokal cerdas yang memungkinkan pengguna untuk tetap mengakses daftar film favorit pengguna meskipun sedang tidak ada koneksi internet (Offline Mode).
+**Nama:** Mohammad Luqman Hakim 
+**NIM:** 235410085
 
-### Fitur Utama
-* **Daftar Film Real-time**: Menampilkan daftar film populer yang selalu diperbarui langsung dari The Movie Database (TMDB).
-* **Mode Responsif (Adaptive Grid)**: Layar utama menggunakan sistem grid yang secara cerdas dan otomatis membagi jumlah kolom kartu film agar proporsional, baik saat HP dalam keadaan tegak (*portrait*) maupun mendatar (*landscape*).
-* **Fitur Bookmark Interaktif**: Pengguna dapat menyimpan film ke dalam *database* lokal menggunakan tombol ikon pita (bookmark). Ikon ini memberikan umpan balik visual secara langsung (berubah warna) untuk membedakan film yang sudah disimpan dan yang belum.
-* **Offline Mode Dinamis**: Aplikasi memiliki penanganan status jaringan yang mulus. Jika koneksi internet terputus, aplikasi tidak akan *crash*, melainkan secara otomatis membuka *database* lokal dan menampilkan daftar film yang telah disimpan sebelumnya.
-* **State Management Cerdas**: Menangani status *Loading*, *Success*, dan *Error* secara responsif tanpa membekukan antarmuka pengguna.
+Aplikasi Android yang menyajikan daftar film populer secara *real-time* dan menyediakan fitur penyimpanan lokal (bookmark). **Masalah yang diselesaikan oleh aplikasi ini adalah:** membantu pengguna melacak katalog film favorit mereka dengan mudah dan memecahkan masalah keterbatasan akses dengan memungkinkan pengguna tetap dapat melihat daftar film yang disimpan meskipun sedang tidak ada koneksi internet (Offline Mode).
 
-### Teknologi & Arsitektur
-Aplikasi ini dikembangkan menggunakan **Kotlin** murni dengan spesifikasi berikut:
-* **UI Framework**: **Jetpack Compose** (Deklaratif UI penuh, tanpa menggunakan XML sama sekali).
-* **Arsitektur**: **MVVM (Model-View-ViewModel)** dengan pemisahan tanggung jawab yang ketat antara Data, UI, dan Logika.
-* **Network & Parsing**: **Retrofit2** & **Gson** untuk komunikasi REST API dan ekstraksi data JSON.
-* **Local Persistence (Caching)**: **Room Database** (SQLite) dengan dukungan kompiler **KSP** (Kotlin Symbol Processing) yang cepat dan efisien.
-* **Image Loading**: **Coil Compose** (AsyncImage) untuk memuat dan menyajikan poster film beresolusi tinggi secara *asynchronous*.
-* **Asynchronous Programming**: **Coroutines** & **StateFlow** untuk mengalirkan data secara *real-time* dari latar belakang ke UI.
+## Fitur Utama & Implementasi Teknis
 
-### Struktur Direktori Proyek
-Berikut adalah struktur direktori aplikasi dengan standar arsitektur MVVM:
+Berikut adalah detail teknis mengenai implementasi fitur dan materi dalam proyek ini:
+
+### 1. Material Design (UI & Layout)
+Aplikasi ini menggunakan komponen **Material 3** secara penuh tanpa XML.
+* **Komponen Standar:** Menggunakan `Scaffold` untuk struktur dasar layar, `TopAppBar` untuk navigasi atas, `FloatingActionButton` untuk tombol simpan, dan `Card` untuk membungkus setiap item film dengan efek elevasi (bayangan).
+* **Tata Letak Responsif:** Halaman detail menggunakan sensor orientasi layar (`LocalConfiguration`). Jika *portrait*, susunan menggunakan `Column` (atas-bawah). Jika *landscape*, susunan menggunakan `Row` (kiri-kanan) agar proporsional.
+
+### 2. Arsitektur MVVM (Model-View-ViewModel)
+Aplikasi mengikuti pola arsitektur **MVVM**:
+* **Model (Data Layer):** Mengelola sumber data dari API (Remote) dan Room Database (Local) melalui kelas `MovieRepository`.
+* **View (UI Layer):** Murni bertugas menampilkan UI berdasarkan *state* yang diberikan.
+* **ViewModel (Logic Layer):** `MovieViewModel` mengelola *UI State* (Loading, Success, Error) menggunakan `StateFlow`. Jika internet mati (kondisi Error jaringan), ViewModel secara cerdas akan mengambil data dari Room Database sebagai fallback.
+
+### 3. Navigasi Jetpack Compose
+Mengimplementasikan navigasi perpindahan layar yang terpusat:
+* **NavHost & NavController:** Diatur di dalam `MovieApp.kt` untuk berpindah dari `HomeScreen` ke `DetailScreen`.
+* **Passing Data:** Rute navigasi membawa argumen berupa ID film (`"detail_screen/{movieId}"`), yang kemudian ditangkap oleh layar detail untuk menampilkan informasi spesifik.
+
+### 4. Akses ke Internet & Offline Persistence
+* **Retrofit & Coroutines:** Menggunakan pustaka Retrofit2 dan fungsi asinkron (`suspend fun` & `viewModelScope.launch`) untuk mengambil data JSON secara *real-time* dari endpoint TMDB.
+* **Room Database (Nilai Tambah):** Menggunakan KSP (Kotlin Symbol Processing) untuk membuat SQLite lokal. Film dapat disimpan ke memori HP dan dibaca secara asinkron menggunakan aliran data `Flow`.
+
+### 5. Parsing Data
+Data JSON dari API dikonversi menjadi objek Kotlin menggunakan **Gson**:
+* Anotasi `@field:SerializedName("...")` digunakan pada *data class* untuk memetakan nama variabel dengan gaya penulisan *snake_case* dari JSON TMDB (seperti `poster_path`) menjadi *camelCase* di Kotlin (`posterPath`).
+
+### 6. Menampilkan Data & Gambar
+* **LazyVerticalGrid Adaptif:** Menampilkan galeri film secara efisien. Grid diatur secara `Adaptive(minSize = 160.dp)` sehingga jumlah kolom otomatis bertambah (3-5 kolom) saat layar HP dalam posisi *landscape*.
+* **Coil (AsyncImage):** Memuat poster film beresolusi tinggi langsung dari URL internet secara asinkron, lengkap dengan penanganan *placeholder* (gambar sementara saat *loading*) dan *error state* (saat gambar gagal dimuat).
+
+---
+
+## Struktur Direktori Proyek (Arsitektur MVVM)
 
 ```text
 MovieVerse/
@@ -68,7 +88,7 @@ MovieVerse/
                             └── DetailScreen.kt// Halaman detail. Menampilkan poster besar, sinopsis, dan detektor layar (menggunakan Row untuk landscape, dan Column untuk portrait).
 ```
 
-### Dokumentasi API
+## Dokumentasi API
 
 Aplikasi ini menggunakan layanan data publik dari **The Movie Database (TMDB) API**.
 
@@ -77,7 +97,7 @@ Aplikasi ini menggunakan layanan data publik dari **The Movie Database (TMDB) AP
 * **Query Parameter**: `api_key` (Diperlukan untuk autentikasi permintaan data).
 * **Image Base URL**: `https://image.tmdb.org/t/p/w500/` (Digunakan untuk menggabungkan `poster_path` dari JSON menjadi bentuk gambar beresolusi 500px yang siap dirender).
 
-### Screenshot Aplikasi
+## Screenshot Aplikasi
 
 | Halaman Utama (Portrait) | Halaman Utama (Landscape) |
 | :---: | :---: |
@@ -87,3 +107,9 @@ Aplikasi ini menggunakan layanan data publik dari **The Movie Database (TMDB) AP
 | Halaman Detail (Portrait) | Halaman Detail (Landscape) |
 | :---: | :---: |
 | ![Detail](screenshots/HalamanDetail(Potrait).png) | ![Detail](screenshots/HalamanDetail(Landscape).png) |
+
+## Cara Menjalankan Proyek
+1. Clone repositori ini.
+2. Buka di Android Studio.
+3. Pastikan perangkat atau emulator Anda memiliki koneksi internet.
+4. Klik Run untuk menginstal dan menjalankan aplikasi.
