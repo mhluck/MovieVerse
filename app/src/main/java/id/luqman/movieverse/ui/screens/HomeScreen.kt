@@ -57,7 +57,7 @@ fun HomeScreen(
                         movie = movie,
                         isSaved = savedMovieIds.contains(movie.id), // Cek apakah film ini sudah disimpan
                         onClick = { onMovieClick(movie.id) },
-                        onSaveClick = { onSaveClick(movie) }
+                        onSaveClick = { onSaveClick(movie) } // Event Hoisting: Aksi klik dikirim ke saveMovie() di dalam ViewModel
                     )
                 }
             }
@@ -76,22 +76,27 @@ fun MovieCard(
 
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(8.dp) // Modifiers: Mengatur jarak antar kartu dalam Grid
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .clickable { onClick() }, // Modifiers Interaksi: Deteksi klik navigasi
+        shape = RoundedCornerShape(12.dp), // Material 3: Sudut melengkung (Card Shape)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp) // Material 3: Elevasi/Bayangan
     ) {
+        // Konten internal kartu (AsyncImage, Text, dan IconButton Bookmark)
         Column {
             Box {
                 // Menampilkan poster film dari internet
+                // Menggabungkan Base URL Image resmi TMDB dengan string posterPath hasil parsing JSON
                 AsyncImage(
                     model = "https://image.tmdb.org/t/p/w500${movie.posterPath}",
                     contentDescription = movie.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().height(220.dp),
+                    // Pemenuhan Standar Kenyamanan UX Pengguna (State Handling Gambar)
                     placeholder = painterResource(android.R.drawable.ic_menu_report_image),
+                    // Tampil saat mendownload
                     error = painterResource(android.R.drawable.ic_delete)
+                    // Tampil jika gagal muat / offline
                 )
 
                 // Tombol bookmark untuk menyimpan/menghapus film

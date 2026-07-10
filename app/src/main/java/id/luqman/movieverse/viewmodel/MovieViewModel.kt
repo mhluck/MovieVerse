@@ -26,7 +26,7 @@ class MovieViewModel(private val repository: MovieRepository) : ViewModel() {
 
     // Flow untuk Halaman Offline (Data dari Room)
     // Room sudah mengembalikan nilai berupa Flow, jadi kita tinggal meneruskannya ke UI
-    val savedMovies = repository.getSavedMovies()
+    val savedMovies = repository.getSavedMovies() // Mengalirkan real-time data Flow dari Room
 
     init {
         // Saat ViewModel pertama kali dibuat, langsung ambil data dari internet
@@ -77,7 +77,7 @@ class MovieViewModel(private val repository: MovieRepository) : ViewModel() {
 
     // Fungsi menyimpan film ke Room Database (Offline Mode)
     fun saveMovie(movie: Movie) {
-        viewModelScope.launch {
+        viewModelScope.launch { // Coroutines: Membuka thread latar belakang
             // Ubah format Movie (dari API) menjadi MovieEntity (untuk Room)
             val entity = MovieEntity(
                 id = movie.id,
@@ -87,7 +87,7 @@ class MovieViewModel(private val repository: MovieRepository) : ViewModel() {
                 releaseDate = movie.releaseDate,
                 voteAverage = movie.voteAverage
             )
-            repository.saveMovieToDb(entity)
+            repository.saveMovieToDb(entity) // Perintah diteruskan ke Repository
         }
     }
 }

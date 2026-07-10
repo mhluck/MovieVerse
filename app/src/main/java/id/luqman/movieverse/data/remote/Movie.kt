@@ -9,7 +9,7 @@ data class Movie(
 
     // SerializedName bertugas mencocokkan teks JSON ("poster_path")
     // ke variabel Kotlin ("posterPath")
-    @field:SerializedName("poster_path")
+    @field:SerializedName("poster_path") // Penerjemahan key JSON via Gson
     val posterPath: String?,
 
     @field:SerializedName("release_date")

@@ -16,10 +16,11 @@ import id.luqman.movieverse.viewmodel.MovieViewModel
 @Composable
 fun MovieApp(viewModel: MovieViewModel) {
     // Membuat kontroler untuk mengatur perpindahan antar layar
-    val navController = rememberNavController()
+    val navController = rememberNavController() // Inisialisasi NavController
 
     // Memantau data film yang tersimpan di database agar UI selalu update
     val savedMovies by viewModel.savedMovies.collectAsState(initial = emptyList())
+
     // Mengambil daftar ID film yang sudah disimpan untuk pengecekan status ikon
     val savedMovieIds = savedMovies.map { it.id }
 
@@ -34,7 +35,8 @@ fun MovieApp(viewModel: MovieViewModel) {
                 uiState = uiState,
                 savedMovieIds = savedMovieIds, // Kirim daftar ID film tersimpan ke layar utama
                 onMovieClick = { movieId ->
-                    navController.navigate("detail_screen/$movieId") // Pindah ke halaman detail
+                    navController.navigate("detail_screen/$movieId")
+                               // Oper Parameter ID, Pindah ke halaman detail
                 },
                 onSaveClick = { movie ->
                     viewModel.saveMovie(movie) // Simpan film ke database
@@ -44,9 +46,10 @@ fun MovieApp(viewModel: MovieViewModel) {
 
         // Rute untuk Halaman Detail (menggunakan argumen movieId)
         composable(
-            route = "detail_screen/{movieId}",
-            arguments = listOf(navArgument("movieId") { type = NavType.IntType })
+            route = "detail_screen/{movieId}", // Definisi Rute Dinamis menangkap {movieId}
+            arguments = listOf(navArgument("movieId") { type = NavType.IntType }) // Validasi tipe data
         ) { backStackEntry ->
+            // Ekstraksi Parameter: Mengambil ID film yang dikirim oleh rute pertama
             val movieId = backStackEntry.arguments?.getInt("movieId")
             val uiState by viewModel.homeState.collectAsState()
 
